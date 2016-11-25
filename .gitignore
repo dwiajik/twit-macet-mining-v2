@@ -1,0 +1,4 @@
+venv
+.env
+classified_tweets.*
+__pycache__

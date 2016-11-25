@@ -1,0 +1,13 @@
+click==6.6
+mysql-connector-python-rf==2.2.1
+nltk==3.2.1
+numpy==1.11.2
+oauthlib==2.0.0
+python-dotenv==0.6.1
+requests==2.12.1
+requests-oauthlib==0.7.0
+scikit-learn==0.18.1
+scipy==0.18.1
+six==1.10.0
+sklearn==0.0
+tweepy==3.5.0
