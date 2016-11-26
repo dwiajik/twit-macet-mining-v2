@@ -8,9 +8,7 @@ import time
 
 import nltk
 import nltk.classify
-from sklearn.naive_bayes import BernoulliNB
 from sklearn.svm import LinearSVC
-from sklearn.tree import DecisionTreeClassifier
 from nltk.tag import tnt
 
 import mysql.connector
@@ -79,38 +77,12 @@ class Classifier:
         print('Using', len(train_set), 'training data.')
 
         start_time = time.time()
-        #self.naive_bayes_classifier = nltk.NaiveBayesClassifier.train(train_set)
-        self.naive_bayes_classifier = nltk.classify.SklearnClassifier(BernoulliNB()).train(train_set)
-        naive_bayes_time = round(time.time() - start_time, 2)
-        print('Naive Bayes Classifier training time:', naive_bayes_time, 'seconds')
-
-        start_time = time.time()
         self.svm_classifier = nltk.classify.SklearnClassifier(LinearSVC()).train(train_set)
         svm_time = round(time.time() - start_time, 2)
         print('SVM Classifier training time:', svm_time, 'seconds')
 
-        start_time = time.time()
-        #self.decision_tree_classifier = nltk.DecisionTreeClassifier.train(train_set)
-        self.decision_tree_classifier = nltk.classify.SklearnClassifier(DecisionTreeClassifier()).train(train_set)
-        decision_tree_time = round(time.time() - start_time, 2)
-        print('Decision Tree Classifier training time:', decision_tree_time, 'seconds')
-
-        # self.maxent_classifier = nltk.MaxentClassifier.train(train_set)
-        # self.conditional_exponential_classifier = nltk.ConditionalExponentialClassifier.train(train_set)
-        # self.weka_classifier = nltk.WekaClassifier.train(train_set)
-
-        # print('Maxent Classifier accuracy:', str(round(nltk.classify.accuracy(self.maxent_classifier, test_set) * 100, 2)) + '%')
-        # print('Conditional Exponential Classifier accuracy:', str(round(nltk.classify.accuracy(self.conditional_exponential_classifier, test_set) * 100, 2)) + '%')
-        # print('Weka Classifier accuracy:', str(round(nltk.classify.accuracy(self.weka_classifier, test_set) * 100, 2)) + '%')
-
-    def naive_bayes_classify(self, tweet):
-        return self.naive_bayes_classifier.classify(self.tweet_features(tweet))
-
     def svm_classify(self, tweet):
         return self.svm_classifier.classify(self.tweet_features(tweet))
-
-    def decision_tree_classify(self, tweet):
-        return self.decision_tree_classifier.classify(self.tweet_features(tweet))
 
 
 class Location:
@@ -186,50 +158,36 @@ class TwitterStreamer(StreamListener):
     def on_data(self, data):
         try:
             tweet = json.loads(data)['text'].replace('\n', ' ')
-            # if self.classifier.naive_bayes_classify(tweet) is 'traffic' or \
-            # self.classifier.svm_classify(tweet) is 'traffic' or \
-            # self.classifier.decision_tree_classify(tweet) is 'traffic':
 
-            nb_result = str(self.classifier.naive_bayes_classify(tweet))
             svm_result = str(self.classifier.svm_classify(tweet))
-            dt_result = str(self.classifier.decision_tree_classify(tweet))
 
             if sys.argv[1] == "dev":
                 print('| ' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                      '\t| ' + nb_result,
                       '\t| ' + svm_result,
-                      '\t| ' + dt_result,
                       '\t| ' + tweet)
                 with open(os.path.dirname(__file__) + 'classified_tweets.txt', 'a') as f:
                     f.write('\n| ' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") +
-                            '\t| ' + nb_result +
                             '\t| ' + svm_result +
-                            '\t| ' + dt_result +
                             '\t| ' + tweet)
                 with open(os.path.dirname(__file__) + 'classified_tweets.csv', 'a') as f:
                     f.write('"' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") +
-                            '","' + nb_result +
                             '","' + svm_result +
-                            '","' + dt_result +
                             '","' + tweet + '"\n')
 
-            if nb_result == "traffic" or svm_result == "traffic" or dt_result == "traffic":
+            if svm_result == "traffic":
                 ts = datetime.datetime.strftime(datetime.datetime.strptime(json.loads(data)['created_at'], 
                     '%a %b %d %H:%M:%S +0000 %Y') + datetime.timedelta(hours=7), '%Y-%m-%d %H:%M:%S')
 
-                con = mysql.connector.connect(host='localhost', database='twitmacet', user='root', password='asdflkjh')
+                con = mysql.connector.connect(host=settings.mysql_host, database=settings.mysql_db, user=settings.mysql_user, password=settings.mysql_password)
                 cur = con.cursor()
                 add_tweet = (
-                "INSERT INTO tweets(date_time, user_id, raw_tweet, naive_bayes, svm, decision_tree, detected_locations, created_at) VALUES(%s, %s, %s, %s, %s, %s, %s, %s)")
+                "INSERT INTO tweets(datetime, twitter_user_id, text, category, locations) VALUES(%s, %s, %s, %s, %s)")
                 tweet_data = (
-                    ts, 
+                    ts,
                     json.loads(data)['user']['id_str'],
-                    tweet, 
-                    nb_result, 
+                    tweet,
                     svm_result,
-                    dt_result, 
-                    str(self.location.find_locations(tweet)),
-                    datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    str(self.location.find_locations(tweet))
                 )
                 cur.execute(add_tweet, tweet_data)
                 con.commit()
