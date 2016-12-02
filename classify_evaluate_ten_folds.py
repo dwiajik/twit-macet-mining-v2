@@ -100,7 +100,6 @@ for i in range(fold):
     start_time = time.time()
     svm_classifier = nltk.classify.SklearnClassifier(LinearSVC(max_iter=10000)).train(train_set)
     svm_time = round(time.time() - start_time, 2)
-    svm_accuracy = nltk.classify.accuracy(svm_classifier, test_set)
      
     svm_true_positive = 0
     svm_true_negative = 0
@@ -117,6 +116,7 @@ for i in range(fold):
         if label == 'non_traffic' and observed == 'traffic':
             svm_false_negative += 1
 
+    svm_accuracy = (svm_true_positive + svm_true_negative) / (svm_true_positive + svm_true_negative + svm_false_positive + svm_false_negative)
     svm_precision = svm_true_positive / (svm_true_positive + svm_false_positive)
     svm_recall = svm_true_positive / (svm_true_positive + svm_false_negative)
     svm_f_measure = f_measure(svm_precision, svm_recall)
@@ -142,7 +142,7 @@ for i in range(fold):
     print('\t', 'Recall:', svm_recall)
     print('\t', 'F-Measure:', svm_f_measure)
 
-print('\nSVM Classifier:')
+print('\nSummary SVM Classifier:')
 print('\tAverage training time:', sum(svm_times) / len(svm_times))
 print('\tAverage true positive:', sum(svm_true_positives) / len(svm_true_positives))
 print('\tAverage true negative:', sum(svm_true_negatives) / len(svm_true_negatives))

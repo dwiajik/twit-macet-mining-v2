@@ -43,18 +43,16 @@ class Classifier:
         features = {}
         tweet = self.clean_tweet(tweet)
 
-        for word in open('feature_word_list.txt'):
-            word = word.rstrip('\n').rstrip('\r')
-            features["count({})".format(word)] = tweet.count(word)
+        #for word in open('feature_word_list.txt'):
+        #    word = word.rstrip('\n').rstrip('\r')
+        #    features["count({})".format(word)] = tweet.count(word)
+
+        for word in tweet.split():
+            features["{}".format(word)] = tweet.count(word)
 
         return features
 
-    def __init__(self):
-        labeled_tweets = (
-            [(line, 'traffic') for line in open('tweets_corpus/traffic_tweets_combined.txt')] +
-            [(line, 'non_traffic') for line in open('tweets_corpus/random_tweets.txt')] +
-            [(line, 'non_traffic') for line in open('tweets_corpus/non_traffic_tweets.txt')]
-        )
+    def __init__(self, labeled_tweets):
         random.shuffle(labeled_tweets)
         train_set = [(self.tweet_features(tweet), category) for (tweet, category) in labeled_tweets]
         print('Using', len(train_set), 'training data.')

@@ -19,10 +19,16 @@ os.environ['TZ'] = 'Asia/Jakarta'
 auth = OAuthHandler(settings.consumer_key, settings.consumer_secret)
 auth.set_access_token(settings.access_token, settings.access_secret)
 
+labeled_tweets = (
+    [(line, 'traffic') for line in open('tweets_corpus/traffic_tweets_combined.txt')] +
+    [(line, 'non_traffic') for line in open('tweets_corpus/random_tweets.txt')] +
+    [(line, 'non_traffic') for line in open('tweets_corpus/non_traffic_tweets.txt')]
+)
+
 class TwitterStreamer(StreamListener):
     def __init__(self):
         super(TwitterStreamer, self).__init__()
-        self.classifier = Classifier()
+        self.classifier = Classifier(labeled_tweets)
         self.location = Location()
         print('\nTweets:')
         with open(os.path.dirname(__file__) + 'classified_tweets.txt', 'a') as f:
