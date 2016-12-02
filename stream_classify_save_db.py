@@ -29,6 +29,8 @@ class TwitterStreamer(StreamListener):
     def __init__(self):
         super(TwitterStreamer, self).__init__()
         self.classifier = Classifier(labeled_tweets)
+        print('Using', self.classifier.get_data_count(), 'training data.')
+        print('SVM Classifier training time:', self.classifier.get_training_time(), 'seconds')
         self.location = Location()
         print('\nTweets:')
         with open(os.path.dirname(__file__) + 'classified_tweets.txt', 'a') as f:
@@ -38,7 +40,7 @@ class TwitterStreamer(StreamListener):
         try:
             tweet = json.loads(data)['text'].replace('\n', ' ')
 
-            svm_result = str(self.classifier.svm_classify(tweet))
+            svm_result = str(self.classifier.classify(tweet))
 
             if sys.argv[1] == "dev":
                 print('| ' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),

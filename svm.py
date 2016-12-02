@@ -55,12 +55,17 @@ class Classifier:
     def __init__(self, labeled_tweets):
         random.shuffle(labeled_tweets)
         train_set = [(self.tweet_features(tweet), category) for (tweet, category) in labeled_tweets]
-        print('Using', len(train_set), 'training data.')
+        self.data_count = len(train_set)
 
         start_time = time.time()
-        self.svm_classifier = nltk.classify.SklearnClassifier(LinearSVC()).train(train_set)
-        svm_time = round(time.time() - start_time, 2)
-        print('SVM Classifier training time:', svm_time, 'seconds')
+        self.svm_classifier = nltk.classify.SklearnClassifier(LinearSVC(max_iter=10000)).train(train_set)
+        self.training_time = round(time.time() - start_time, 2)
 
-    def svm_classify(self, tweet):
+    def classify(self, tweet):
         return self.svm_classifier.classify(self.tweet_features(tweet))
+
+    def get_training_time(self):
+        return self.training_time
+
+    def get_data_count(self):
+        return self.data_count

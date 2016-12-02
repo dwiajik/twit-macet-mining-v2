@@ -12,48 +12,7 @@ import sys
 import time
 import datetime
 
-def clean_tweet(tweet):
-    # remove "RT"
-    regex = re.compile('RT\s')
-    tweet = regex.sub(' ', tweet)
-
-    tweet = tweet.lower()
-
-    # remove non alphabetic character
-    regex = re.compile('https?(:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})?')
-    tweet = regex.sub(' ', tweet)
-    regex = re.compile('@[a-zA-Z0-9_]+')
-    tweet = regex.sub(' ', tweet)
-    regex = re.compile('[^a-zA-Z0-9]')
-    tweet = regex.sub(' ', tweet)
-
-    # replace abbreviations
-    replacement_word_list = [line.rstrip('\n').rstrip('\r') for line in open('replacement_word_list.txt')]
-
-    replacement_words = {}
-    for replacement_word in replacement_word_list:
-        replacement_words[replacement_word.split(',')[0]] = replacement_word.split(',')[1]
-
-    new_string = []
-    for word in tweet.split():
-        if replacement_words.get(word, None) is not None:
-            word = replacement_words[word]
-        new_string.append(word)
-
-    tweet = ' '.join(new_string)
-    return tweet
-
-def tweet_features(tweet):
-    features = {}
-    tweet = clean_tweet(tweet)
-
-    #for word in open('feature_word_list.txt'):
-    #    word = word.rstrip('\n').rstrip('\r')
-    #    features["{}".format(word)] = tweet.count(word)
-    for word in tweet.split():
-        features["{}".format(word)] = tweet.count(word)
-
-    return features
+from svm import Classifier
 
 def f_measure(precision, recall):
     return 2*((precision * recall) / (precision + recall))
@@ -88,18 +47,15 @@ print('Non traffic tweets:', len(non_traffic_tweets),'data')
 fold = 10
 
 for i in range(fold):
-    train_set = [(tweet_features(tweet), category) for (tweet, category) in labeled_tweets[0:i*int(len(labeled_tweets)/fold)]] + \
-        [(tweet_features(tweet), category) for (tweet, category) in labeled_tweets[(i+1)*int(len(labeled_tweets)/fold):len(labeled_tweets)]]
-    test_set = [(tweet_features(tweet), category) for (tweet, category) in labeled_tweets[i*int(len(labeled_tweets)/fold):(i+1)*int(len(labeled_tweets)/fold)]]
+    train_set = labeled_tweets[0:i*int(len(labeled_tweets)/fold)] + labeled_tweets[(i+1)*int(len(labeled_tweets)/fold):len(labeled_tweets)]
+    test_set = labeled_tweets[i*int(len(labeled_tweets)/fold):(i+1)*int(len(labeled_tweets)/fold)]
 
     print('\nIteration', (i+1))
     print('Training data:', len(train_set), 'data')
     print('Test data:', len(test_set), 'data')
 
     # SVM
-    start_time = time.time()
-    svm_classifier = nltk.classify.SklearnClassifier(LinearSVC(max_iter=10000)).train(train_set)
-    svm_time = round(time.time() - start_time, 2)
+    svm_classifier = Classifier(train_set)
      
     svm_true_positive = 0
     svm_true_negative = 0
@@ -116,6 +72,7 @@ for i in range(fold):
         if label == 'non_traffic' and observed == 'traffic':
             svm_false_negative += 1
 
+    svm_time = svm_classifier.get_training_time()
     svm_accuracy = (svm_true_positive + svm_true_negative) / (svm_true_positive + svm_true_negative + svm_false_positive + svm_false_negative)
     svm_precision = svm_true_positive / (svm_true_positive + svm_false_positive)
     svm_recall = svm_true_positive / (svm_true_positive + svm_false_negative)
