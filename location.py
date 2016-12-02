@@ -5,6 +5,10 @@ from nltk.tag import tnt
 
 class Location:
     def clean_tweet(self, tweet):
+        # remove "RT"
+        regex = re.compile('RT\s')
+        tweet = regex.sub(' ', tweet)
+
         tweet = tweet.lower()
 
         # remove non alphabetic character
