@@ -23,9 +23,20 @@ non_traffic_tweets = [(line, 'non_traffic') for line in open('tweets_corpus/rand
 random.shuffle(traffic_tweets)
 random.shuffle(non_traffic_tweets)
 
-if sys.argv[1] == "balance":
+if sys.argv[1] == 'all':
+    pass
+elif sys.argv[1] == 'under':
     traffic_tweets = traffic_tweets[:min([len(traffic_tweets), len(non_traffic_tweets)])]
     non_traffic_tweets = non_traffic_tweets[:min([len(traffic_tweets), len(non_traffic_tweets)])]
+elif sys.argv[1] == 'over':
+    mul = int(max([len(traffic_tweets), len(non_traffic_tweets)]) / min([len(traffic_tweets), len(non_traffic_tweets)]))
+    print(mul)
+    if len(traffic_tweets) > len(non_traffic_tweets):
+        non_traffic_tweets = non_traffic_tweets * (mul + 1)
+        non_traffic_tweets = non_traffic_tweets[:len(traffic_tweets)]
+    else:
+        traffic_tweets = traffic_tweets * (mul + 1)
+        traffic_tweets = traffic_tweets[:len(non_traffic_tweets)]
 
 labeled_tweets = (traffic_tweets + non_traffic_tweets)
 random.shuffle(labeled_tweets)
@@ -44,7 +55,29 @@ print('Start analysis with total:', len(labeled_tweets), 'data')
 print('Traffic tweets:', len(traffic_tweets),'data')
 print('Non traffic tweets:', len(non_traffic_tweets),'data')
 
+with open(os.path.dirname(__file__) + 'evaluation.csv', 'a') as f:
+    f.write('"{}"\r\n'.format(sys.argv))
+    f.write('"{}"\r\n'.format(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
+    f.write('"Start analysis with total: {} data"\r\n'.format(len(labeled_tweets)))
+    f.write('"Traffic tweets: {} data"\r\n'.format(len(traffic_tweets)))
+    f.write('"Non traffic tweets: {} data"\r\n\r\n'.format(len(non_traffic_tweets)))
+
 fold = 10
+
+data_format = '"{}","{}","{}","{}","{}","{}","{}","{}","{}","{}"\r\n'
+with open(os.path.dirname(__file__) + 'evaluation.csv', 'a') as f:
+    f.write(data_format.format(
+        'Iteration',
+        'Training time',
+        'True positive',
+        'True negative',
+        'False positive',
+        'False negative',
+        'Accuracy',
+        'Precision',
+        'Recall',
+        'F-measure'
+    ))
 
 for i in range(fold):
     train_set = labeled_tweets[0:i*int(len(labeled_tweets)/fold)] + labeled_tweets[(i+1)*int(len(labeled_tweets)/fold):len(labeled_tweets)]
@@ -61,7 +94,7 @@ for i in range(fold):
     svm_true_negative = 0
     svm_false_positive = 0
     svm_false_negative = 0
-    for i, (feature, label) in enumerate(test_set):
+    for index, (feature, label) in enumerate(test_set):
         observed = svm_classifier.classify(feature)
         if label == 'traffic' and observed == 'traffic':
             svm_true_positive += 1
@@ -88,6 +121,20 @@ for i in range(fold):
     svm_recalls.append(svm_recall)
     svm_f_measures.append(svm_f_measure)
 
+    with open(os.path.dirname(__file__) + 'evaluation.csv', 'a') as f:
+        f.write(data_format.format(
+            i + 1,
+            svm_time,
+            svm_true_positive,
+            svm_true_negative,
+            svm_false_positive,
+            svm_false_negative,
+            svm_accuracy,
+            svm_precision,
+            svm_recall,
+            svm_f_measure
+        ))
+
     print('SVM Classifier:')
     print('\t', 'Training time:', svm_time)    
     print('\t', 'True positive:', svm_true_positive)
@@ -98,6 +145,21 @@ for i in range(fold):
     print('\t', 'Precision:', svm_precision)
     print('\t', 'Recall:', svm_recall)
     print('\t', 'F-Measure:', svm_f_measure)
+
+
+with open(os.path.dirname(__file__) + 'evaluation.csv', 'a') as f:
+    f.write((data_format + '\r\n\r\n').format(
+        'Total',
+        sum(svm_times) / len(svm_times),
+        sum(svm_true_positives) / len(svm_true_positives),
+        sum(svm_true_negatives) / len(svm_true_negatives),
+        sum(svm_false_positives) / len(svm_false_positives),
+        sum(svm_false_negatives) / len(svm_false_negatives),
+        sum(svm_accuracies) / len(svm_accuracies),
+        sum(svm_precisions) / len(svm_precisions),
+        sum(svm_recalls) / len(svm_recalls),
+        sum(svm_f_measures) / len(svm_f_measures)
+    ))
 
 print('\nSummary SVM Classifier:')
 print('\tAverage training time:', sum(svm_times) / len(svm_times))

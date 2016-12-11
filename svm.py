@@ -58,7 +58,7 @@ class Classifier:
         self.data_count = len(train_set)
 
         start_time = time.time()
-        self.svm_classifier = nltk.classify.SklearnClassifier(LinearSVC(max_iter=10000)).train(train_set)
+        self.svm_classifier = nltk.classify.SklearnClassifier(LinearSVC()).train(train_set)
         self.training_time = round(time.time() - start_time, 2)
 
     def classify(self, tweet):

@@ -1,4 +1,5 @@
 venv
 .env
 classified_tweets.*
+evaluation.csv
 __pycache__
