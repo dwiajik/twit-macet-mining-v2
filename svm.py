@@ -1,3 +1,5 @@
+import collections
+import math
 import random
 import re
 import time
@@ -39,7 +41,7 @@ class Classifier:
         tweet = ' '.join(new_string)
         return tweet
 
-    def tweet_features(self, tweet):
+    def tweet_features_bow(self, tweet):
         features = {}
         tweet = self.clean_tweet(tweet)
 
@@ -52,9 +54,58 @@ class Classifier:
 
         return features
 
-    def __init__(self, labeled_tweets):
+    def tweet_features_tfidf(self, tweet):
+        features = {}
+        tweet = self.clean_tweet(tweet)
+        for word in tweet.split():
+            try:
+                features["{}".format(word)] = tweet.count(word) * self.idf[word]
+            except:
+                features["{}".format(word)] = tweet.count(word) * math.log(self.tweet_count / 1)
+        return features
+
+    def bow(self, labeled_tweets):
+        tweets_features = []
+        for (tweet, category) in labeled_tweets:
+            features = {}
+            tweet = self.clean_tweet(tweet)
+            for word in tweet.split():
+                features["{}".format(word)] = tweet.count(word)
+            tweets_features.append((features, category))
+        return tweets_features
+
+    def tfidf(self, labeled_tweets):
+        self.df = {}
+        for (tweet, category) in labeled_tweets:
+            tweet = self.clean_tweet(tweet)
+            word_count = collections.Counter(tweet.split())
+            for word in word_count:
+                try:
+                    self.df[word] += 1
+                except:
+                    self.df[word] = 1
+
+        self.idf = {}
+        self.tweet_count = len(labeled_tweets)
+        for word, doc_count in self.df.items():
+            self.idf[word] = math.log(self.tweet_count / (doc_count + 1))
+            
+        tweets_features = []
+        for (tweet, category) in labeled_tweets:
+            features = {}
+            tweet = self.clean_tweet(tweet)
+            for word in tweet.split():
+                features["{}".format(word)] = tweet.count(word) * self.idf[word]
+            tweets_features.append((features, category))
+        return tweets_features
+
+    def __init__(self, labeled_tweets, weighting = None):
+        self.weighting = weighting or 'bow'
         random.shuffle(labeled_tweets)
-        train_set = [(self.tweet_features(tweet), category) for (tweet, category) in labeled_tweets]
+        if self.weighting is 'tfidf':
+            train_set = self.tfidf(labeled_tweets)
+        else:
+            train_set = self.bow(labeled_tweets)
         self.data_count = len(train_set)
 
         start_time = time.time()
@@ -62,7 +113,10 @@ class Classifier:
         self.training_time = round(time.time() - start_time, 2)
 
     def classify(self, tweet):
-        return self.svm_classifier.classify(self.tweet_features(tweet))
+        if self.weighting is 'tfidf':
+            return self.svm_classifier.classify(self.tweet_features_tfidf(tweet))
+        else:
+            return self.svm_classifier.classify(self.tweet_features_bow(tweet))
 
     def get_training_time(self):
         return self.training_time

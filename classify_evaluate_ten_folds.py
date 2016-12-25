@@ -1,9 +1,6 @@
 import random
 import re
 import nltk
-import nltk.classify
-from nltk.metrics import scores
-from sklearn.svm import LinearSVC
 
 import collections
 import json
@@ -30,7 +27,6 @@ elif sys.argv[1] == 'under':
     non_traffic_tweets = non_traffic_tweets[:min([len(traffic_tweets), len(non_traffic_tweets)])]
 elif sys.argv[1] == 'over':
     mul = int(max([len(traffic_tweets), len(non_traffic_tweets)]) / min([len(traffic_tweets), len(non_traffic_tweets)]))
-    print(mul)
     if len(traffic_tweets) > len(non_traffic_tweets):
         non_traffic_tweets = non_traffic_tweets * (mul + 1)
         non_traffic_tweets = non_traffic_tweets[:len(traffic_tweets)]
@@ -62,8 +58,6 @@ with open(os.path.dirname(__file__) + 'evaluation.csv', 'a') as f:
     f.write('"Traffic tweets: {} data"\r\n'.format(len(traffic_tweets)))
     f.write('"Non traffic tweets: {} data"\r\n\r\n'.format(len(non_traffic_tweets)))
 
-fold = 10
-
 data_format = '"{}","{}","{}","{}","{}","{}","{}","{}","{}","{}"\r\n'
 with open(os.path.dirname(__file__) + 'evaluation.csv', 'a') as f:
     f.write(data_format.format(
@@ -79,6 +73,8 @@ with open(os.path.dirname(__file__) + 'evaluation.csv', 'a') as f:
         'F-measure'
     ))
 
+fold = 10
+
 for i in range(fold):
     train_set = labeled_tweets[0:i*int(len(labeled_tweets)/fold)] + labeled_tweets[(i+1)*int(len(labeled_tweets)/fold):len(labeled_tweets)]
     test_set = labeled_tweets[i*int(len(labeled_tweets)/fold):(i+1)*int(len(labeled_tweets)/fold)]
@@ -88,7 +84,7 @@ for i in range(fold):
     print('Test data:', len(test_set), 'data')
 
     # SVM
-    svm_classifier = Classifier(train_set)
+    svm_classifier = Classifier(train_set, 'tfidf')
      
     svm_true_positive = 0
     svm_true_negative = 0
