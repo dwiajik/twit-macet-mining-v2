@@ -15,6 +15,7 @@ parser = argparse.ArgumentParser(description='Evaluate classifier model using te
 parser.add_argument('-n', '--ngrams', type=int, default=1, help='How many n used in n-grams scheme, default "1"')
 parser.add_argument('-w', '--weight', dest='weighting', default='tf', choices=['tf', 'tfidf'], help='Weighting scheme: term frequency or term frequency-inverse document frequency, default "tf"')
 parser.add_argument('-d', '--data', default='all', choices=['all', 'under', 'over'], help='Use all data, undersampled data, or oversampled data, default "all"')
+parser.add_argument('-o', '--output', default='evaluation.csv', help='File name for output CSV, e.g. evaluation.csv')
 args = parser.parse_args()
 
 print('Ngrams: {}'.format(args.ngrams))
@@ -64,7 +65,7 @@ dataset = weighter.get_features()
 print(dataset[:3])
 # svm_model = SvmClassifier(dataset)
 
-with open(os.path.dirname(__file__) + 'evaluation.csv', 'a') as f:
+with open(os.path.dirname(__file__) + args.output, 'a') as f:
     f.write('"{}"\r\n'.format(sys.argv))
     f.write('"{}"\r\n'.format(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
     f.write('"Start analysis with total: {} data"\r\n'.format(len(labeled_tweets)))
@@ -72,7 +73,7 @@ with open(os.path.dirname(__file__) + 'evaluation.csv', 'a') as f:
     f.write('"Non traffic tweets: {} data"\r\n\r\n'.format(len(non_traffic_tweets)))
 
 data_format = '"{}","{}","{}","{}","{}","{}","{}","{}","{}","{}"\r\n'
-with open(os.path.dirname(__file__) + 'evaluation.csv', 'a') as f:
+with open(os.path.dirname(__file__) + args.output, 'a') as f:
     f.write(data_format.format(
         'Iteration',
         'Training time',
@@ -140,7 +141,7 @@ for i in range(fold):
     svm_recalls.append(svm_recall)
     svm_f_measures.append(svm_f_measure)
 
-    with open(os.path.dirname(__file__) + 'evaluation.csv', 'a') as f:
+    with open(os.path.dirname(__file__) + args.output, 'a') as f:
         f.write(data_format.format(
             i + 1,
             svm_time,
@@ -166,7 +167,7 @@ for i in range(fold):
     print('\t', 'F-Measure:', svm_f_measure)
 
 
-with open(os.path.dirname(__file__) + 'evaluation.csv', 'a') as f:
+with open(os.path.dirname(__file__) + args.output, 'a') as f:
     f.write((data_format + '\r\n\r\n').format(
         'Total',
         sum(svm_times) / len(svm_times),
