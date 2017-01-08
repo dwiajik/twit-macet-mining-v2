@@ -9,7 +9,7 @@ class TfWeighting:
         for (tweet, category) in labeled_tweets:
             features = {}
             for token in tweet:
-                features["{}".format(token)] = tweet.count(token)
+                features['{}'.format(token)] = tweet.count(token)
             self.term_frequencies.append((features, category))
 
     def get_features(self):
@@ -18,7 +18,7 @@ class TfWeighting:
     def tf(self, tweet):
         features = {}
         for token in tweet:
-            features["{}".format(token)] = tweet.count(token)
+            features['{}'.format(token)] = tweet.count(token)
         return features
 
 class TfIdfWeighting:
@@ -28,7 +28,7 @@ class TfIdfWeighting:
         #for (tweet, category) in labeled_tweets:
         #    features = {}
         #    for token in tweet:
-        #        features["{}".format(token)] = tweet.count(token)
+        #        features['{}'.format(token)] = tweet.count(token)
         #    self.term_frequencies.append((features, category))
 
         # Calculate Document Frequencies
@@ -46,12 +46,12 @@ class TfIdfWeighting:
         self.tweet_count = len(labeled_tweets)
         for token, doc_count in self.df.items():
             self.idf[token] = math.log(self.tweet_count / (doc_count + 1), 10) # +1 for smoothing
-            
+
         self.tf_idfs = []
         for (tweet, category) in labeled_tweets:
             tf_idf = {}
             for token in tweet:
-                tf_idf["{}".format(token)] = tweet.count(token) * self.idf[token]
+                tf_idf['{}'.format(token)] = tweet.count(token) * self.idf[token]
             self.tf_idfs.append((tf_idf, category))
 
     def get_features(self):
@@ -61,7 +61,7 @@ class TfIdfWeighting:
         features = {}
         for token in tweet:
             try:
-                features["{}".format(token)] = tweet.count(token) * self.idf[token]
+                features['{}'.format(token)] = tweet.count(token) * self.idf[token]
             except:
-                features["{}".format(token)] = tweet.count(token) * math.log(self.tweet_count / 1, 10)
+                features['{}'.format(token)] = tweet.count(token) * math.log(self.tweet_count / 1, 10)
         return features

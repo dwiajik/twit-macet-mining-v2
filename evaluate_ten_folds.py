@@ -9,7 +9,7 @@ from modules.weighting import TfWeighting, TfIdfWeighting
 from modules.classifier import SvmClassifier
 
 def f_measure(precision, recall):
-    return 2*((precision * recall) / (precision + recall))
+    return 2 * ((precision * recall) / (precision + recall))
 
 parser = argparse.ArgumentParser(description='Evaluate classifier model using ten folds cross validation.')
 parser.add_argument('-n', '--ngrams', type=int, default=1, help='How many n used in n-grams scheme, default "1"')
@@ -18,6 +18,7 @@ parser.add_argument('-d', '--data', default='all', choices=['all', 'under', 'ove
 parser.add_argument('-o', '--output', default='evaluation.csv', help='File name for output CSV, e.g. evaluation.csv')
 args = parser.parse_args()
 
+print('Options:')
 print('Ngrams: {}'.format(args.ngrams))
 print('Weighting scheme: {}'.format(args.weighting))
 print('Data imbalance handle: {}\n'.format(args.data))
@@ -109,7 +110,7 @@ for i in range(fold):
 
     # SVM
     svm_classifier = SvmClassifier(train_set)
-     
+
     svm_true_positive = 0
     svm_true_negative = 0
     svm_false_positive = 0
@@ -156,7 +157,7 @@ for i in range(fold):
         ))
 
     print('SVM Classifier:')
-    print('\t', 'Training time:', svm_time)    
+    print('\t', 'Training time:', svm_time)
     print('\t', 'True positive:', svm_true_positive)
     print('\t', 'True negative:', svm_true_negative)
     print('\t', 'False positive:', svm_false_positive)
