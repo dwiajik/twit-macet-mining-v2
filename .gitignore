@@ -4,3 +4,5 @@ classified_tweets.*
 evaluation.csv
 summary.ods
 __pycache__
+outputs/
+.DS_Store
