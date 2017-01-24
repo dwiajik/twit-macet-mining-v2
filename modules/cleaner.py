@@ -14,7 +14,7 @@ def clean(tweet):
     tweet = regex.sub(' ', tweet)
     regex = re.compile('RT\s')
     tweet = regex.sub(' ', tweet)
-    regex = re.compile('[^a-zA-Z]')
+    regex = re.compile('[^a-zA-Z0-9]')
     tweet = regex.sub(' ', tweet)
 
     # replace abbreviations
