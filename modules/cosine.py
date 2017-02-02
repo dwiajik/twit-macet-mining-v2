@@ -1,9 +1,6 @@
 import math
 
 class Cosine:
-    def __init__(self, threshold = 0.6):
-        self.threshold = threshold
-
     def vector(self, a, b):
         vec_a, vec_b = {}, {}
         for token in set(a + b):
@@ -25,7 +22,4 @@ class Cosine:
         try:
             return sop / (sqrt_soas * sqrt_sobs)
         except ZeroDivisionError as e:
-            return 0
-
-    def is_similar(self, a = [], b = []):
-        return self.index(a, b) >= self.threshold
+            return 1

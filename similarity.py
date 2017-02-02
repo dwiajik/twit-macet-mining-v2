@@ -4,20 +4,24 @@ import csv
 import os
 
 from modules import cleaner, tokenizer
-# from modules.jaccard import Jaccard
+from modules.jaccard import Jaccard
 from modules.cosine import Cosine
 
 parser = argparse.ArgumentParser(description='Evaluate classifier model using ten folds cross validation.')
 parser.add_argument('-n', '--ngrams', type=int, default=1, help='How many n used in n-grams scheme, default "1"')
 parser.add_argument('-o', '--output', default='output.csv', help='File name for output CSV, e.g. output.csv')
-# parser.add_argument('-j', '--jaccard', type=float, default=0.6, help='Jaccard index, default: 0.6')
-parser.add_argument('-c', '--cosine', type=float, default=0.6, help='Cosine index, default: 0.6')
+parser.add_argument('-t', '--threshold', type=float, default=0.6, help='Threshold index, default: 0.6')
+parser.add_argument('-a', '--algo', type=str, default='jaccard', help='Algorithm: jaccard, cosine')
 args = parser.parse_args()
 
-# jaccard = Jaccard(args.jaccard)
-cosine = Cosine(args.cosine)
+if args.algo == 'jaccard':
+    algo = Jaccard()
+elif args.algo == 'cosine':
+    algo = Cosine()
+else:
+    raise Exception('Algo not defined')
 
-with open('tweets_corpus/similarity-dataset15075.csv', newline='\n') as csv_input:
+with open(os.path.join(os.path.dirname(__file__), 'tweets_corpus/similarity-dataset15075.csv'), newline='\n') as csv_input:
     dataset = csv.reader(csv_input, delimiter=',', quotechar='"')
     tweets = [(line[0], line[1]) for line in dataset]
 
@@ -26,7 +30,7 @@ tokenized = [(time, tweet, tokenizer.ngrams_tokenizer(cleaned_tweets, args.ngram
 
 distincts = []
 progress = 0
-with open(os.path.dirname(__file__) + args.output, 'w', newline='\n') as csv_output:
+with open(os.path.join(os.path.dirname(__file__), args.output), 'w', newline='\n') as csv_output:
     csv_writer = csv.writer(csv_output, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
     for (time, tweet, tokens) in tokenized:
         progress += 1
@@ -45,13 +49,8 @@ with open(os.path.dirname(__file__) + args.output, 'w', newline='\n') as csv_out
                     distincts.remove((distinct_time, distinct_tweet, distinct_tokens))
                     continue
 
-                # if jaccard.is_similar(tokens, distinct_tokens):
-                #     index = jaccard.index(tokens, distinct_tokens)
-                #     is_distinct = False
-                #     break
-
-                if cosine.is_similar(tokens, distinct_tokens):
-                    index = cosine.index(tokens, distinct_tokens)
+                index = algo.index(tokens, distinct_tokens)
+                if index >= args.threshold:
                     is_distinct = False
                     break
 
