@@ -7,15 +7,10 @@ def clean(tweet):
 
     tweet = tweet.lower()
 
-    # remove non alphabetic character
-    regex = re.compile('\shttp.+\s')
-    tweet = regex.sub(' ', tweet)
-    regex = re.compile('@[a-zA-Z0-9_]+')
-    tweet = regex.sub(' ', tweet)
-    regex = re.compile('RT\s')
-    tweet = regex.sub(' ', tweet)
-    regex = re.compile('[^a-zA-Z0-9]')
-    tweet = regex.sub(' ', tweet)
+    tweet = re.sub(r'http\S+', ' ', tweet)
+    tweet = re.sub(r'@[a-zA-Z0-9_]+', ' ', tweet)
+    tweet = re.sub(r'RT\s', ' ', tweet)
+    tweet = re.sub(r'[^a-zA-Z0-9]', ' ', tweet)
 
     # replace abbreviations
     replacement_word_list = [line.rstrip('\n').rstrip('\r') for line in open('replacement_word_list.txt')]
