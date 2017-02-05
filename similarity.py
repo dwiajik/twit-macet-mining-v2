@@ -3,9 +3,12 @@ from datetime import datetime, timedelta
 import csv
 import os
 
-from modules import cleaner, tokenizer
+from modules import cleaner, tokenizer, time as t
 from modules.jaccard import Jaccard
 from modules.cosine import Cosine
+from modules.location import Location
+
+l = Location()
 
 parser = argparse.ArgumentParser(description='Evaluate classifier model using ten folds cross validation.')
 parser.add_argument('-n', '--ngrams', type=int, default=1, help='How many n used in n-grams scheme, default "1"')
@@ -41,16 +44,17 @@ with open(os.path.join(os.path.dirname(__file__), args.output), 'w', newline='\n
         else:
             is_distinct = True
             for (distinct_time, distinct_tweet, distinct_tokens) in distincts:
-                dt = datetime.strptime(time, '%Y-%m-%d %H:%M:%S');
-                distinct_dt = datetime.strptime(distinct_time, '%Y-%m-%d %H:%M:%S');
+                dt = datetime.strptime(time, '%Y-%m-%d %H:%M:%S')
+                distinct_dt = datetime.strptime(distinct_time, '%Y-%m-%d %H:%M:%S')
                 time_diff = dt - distinct_dt
 
                 if time_diff > timedelta(hours=12):
                     distincts.remove((distinct_time, distinct_tweet, distinct_tokens))
                     continue
 
+                # This part is too sophisticated
                 index = algo.index(tokens, distinct_tokens)
-                if index >= args.threshold:
+                if index >= args.threshold and t.is_text_similar(tweet, distinct_tweet) and l.is_first_loc_similar(tweet, distinct_tweet):
                     is_distinct = False
                     break
 
