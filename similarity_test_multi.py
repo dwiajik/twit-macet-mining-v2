@@ -26,12 +26,10 @@ else:
 
 with open(os.path.join(os.path.dirname(__file__), 'tweets_corpus/similarity_dataset_15028.csv'), newline='\n') as csv_input:
     dataset = csv.reader(csv_input, delimiter=',', quotechar='"')
-    tweets = [(line[0], line[1], line[2]) for line in dataset]    
-
-results = []
-results.append(['limit hours', 'ngrams', 'threshold', 'tp', 'tn', 'fp', 'fn', 'accuracy', 'precision', 'recall', 'f-score', 'time elapsed'])
+    tweets = [(line[0], line[1], line[2]) for line in dataset]
 
 def calculate(hours):
+    results = []
     for ngrams in range(1, 7): # 1-6
         for threshold in numpy.arange(0.1, 1.1, 0.1): # 0.1-1.0
             start_time = tm.time()
@@ -40,7 +38,7 @@ def calculate(hours):
             tokenized = [(time, tweet, category, tokenizer.ngrams_tokenizer(cleaned_tweets, ngrams)) for (time, tweet, category, cleaned_tweets) in cleaned]
 
             distincts = []
-            progress = 0
+            # progress = 0
             tp, tn, fp, fn = 0, 0, 0, 0
 
             for (time, tweet, category, tokens) in tokenized:
@@ -76,7 +74,7 @@ def calculate(hours):
                             tn += 1
 
                 progress += 1
-                print('\r{}/{}'.format(progress, len(tokenized)), end='')
+                # print('\r{}/{}'.format(progress, len(tokenized)), end='')
 
             time_elapsed = tm.time() - start_time
             accuracy = (tp + tn) / (tp + tn + fp + fn)
@@ -99,12 +97,15 @@ def calculate(hours):
             print('Time elapsed: {}'.format(time_elapsed))
 
             results.append([hours, ngrams, threshold, tp, tn, fp, fn, accuracy, precision, recall, fscore, time_elapsed])
+    return results
 
 p = Pool(4)
-p.map(calculate, range(12, 49, 12))
+pool_results = p.map(calculate, range(12, 49, 12))
 
-for result in results:
-    with open(os.path.join(os.path.dirname(__file__), args.output), 'w', newline='\n') as csv_output:
-        csv_writer = csv.writer(csv_output, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
-        csv_writer.writerow(result)
+with open(os.path.join(os.path.dirname(__file__), args.output), 'w', newline='\n') as csv_output:
+    csv_writer = csv.writer(csv_output, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
+    csv_writer.writerow(['limit hours', 'ngrams', 'threshold', 'tp', 'tn', 'fp', 'fn', 'accuracy', 'precision', 'recall', 'f-score', 'time elapsed'])
+    for pool_result in pool_results:
+        for result in pool_result:
+            csv_writer.writerow(result)
         
