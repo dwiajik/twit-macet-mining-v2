@@ -73,7 +73,7 @@ def calculate(hours):
                         else:
                             tn += 1
 
-                progress += 1
+                # progress += 1
                 # print('\r{}/{}'.format(progress, len(tokenized)), end='')
 
             time_elapsed = tm.time() - start_time
