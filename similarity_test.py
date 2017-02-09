@@ -1,7 +1,9 @@
 import argparse
-from datetime import datetime, timedelta
 import csv
+from datetime import datetime, timedelta
+import numpy
 import os
+import time as tm
 
 from modules import cleaner, tokenizer
 from modules.jaccard import Jaccard
@@ -27,15 +29,12 @@ with open(os.path.join(os.path.dirname(__file__), 'tweets_corpus/similarity_data
 
 with open(os.path.join(os.path.dirname(__file__), args.output), 'w', newline='\n') as csv_output:
     csv_writer = csv.writer(csv_output, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
-    csv_writer.writerow(['limit hours', 'ngrams', 'threshold', 'tp', 'tn', 'fp', 'fn', 'accuracy', 'precision', 'recall'])
+    csv_writer.writerow(['limit hours', 'ngrams', 'threshold', 'tp', 'tn', 'fp', 'fn', 'accuracy', 'precision', 'recall', 'f-score', 'time elapsed'])
 
-    for hours in range(48):
-        hours += 1
-        for ngrams in range(4):
-            ngrams += 1 # because range start from 0
-            for threshold in range(10):
-                threshold += 1
-                threshold /= 10
+    for hours in range(12, 49, 12): # [12, 24, 36, 48]
+        for ngrams in range(1, 7): # 1-6
+            for threshold in numpy.arange(0.1, 1.1, 0.1): # 0.1-1.0
+                start_time = tm.time()
 
                 cleaned = [(time, tweet, category, cleaner.clean(tweet)) for (time, tweet, category) in tweets]
                 tokenized = [(time, tweet, category, tokenizer.ngrams_tokenizer(cleaned_tweets, ngrams)) for (time, tweet, category, cleaned_tweets) in cleaned]
@@ -54,7 +53,7 @@ with open(os.path.join(os.path.dirname(__file__), args.output), 'w', newline='\n
                             distinct_dt = datetime.strptime(distinct_time, '%Y-%m-%d %H:%M:%S')
                             time_diff = dt - distinct_dt
 
-                            if time_diff > timedelta(hours=12):
+                            if time_diff > timedelta(hours=hours):
                                 distincts.remove((distinct_time, distinct_tweet, distinct_tokens))
                                 continue
 
@@ -79,9 +78,11 @@ with open(os.path.join(os.path.dirname(__file__), args.output), 'w', newline='\n
                     progress += 1
                     print('\r{}/{}'.format(progress, len(tokenized)), end='')
 
+                time_elapsed = tm.time() - start_time
                 accuracy = (tp + tn) / (tp + tn + fp + fn)
                 precision = tp / (tp + fp)
                 recall = tp / (tp + fn)
+                fscore = 2 * (precision * recall) / (precision + recall)
 
                 print()
                 print('Limit hours: {}'.format(hours))
@@ -94,5 +95,7 @@ with open(os.path.join(os.path.dirname(__file__), args.output), 'w', newline='\n
                 print('Accuracy: {}'.format(accuracy))
                 print('Precison: {}'.format(precision))
                 print('Recall: {}'.format(recall))
+                print('F-score: {}'.format(fscore))
+                print('Time elapsed: {}'.format(time_elapsed))
 
-                csv_writer.writerow([hours, ngrams, threshold, tp, tn, fp, fn, accuracy, precision, recall])
+                csv_writer.writerow([hours, ngrams, threshold, tp, tn, fp, fn, accuracy, precision, recall, fscore, time_elapsed])
