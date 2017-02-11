@@ -11,9 +11,7 @@ from modules.jaccard import Jaccard
 from modules.cosine import Cosine
 
 parser = argparse.ArgumentParser(description='Evaluate classifier model using ten folds cross validation.')
-#parser.add_argument('-n', '--ngrams', type=int, default=1, help='How many n used in n-grams scheme, default "1"')
 parser.add_argument('-o', '--output', default='output.csv', help='File name for output CSV, e.g. output.csv')
-#parser.add_argument('-t', '--threshold', type=float, default=0.6, help='Threshold index, default: 0.6')
 parser.add_argument('-a', '--algo', type=str, default='jaccard', help='Algorithm: jaccard, cosine')
 args = parser.parse_args()
 
@@ -38,7 +36,6 @@ def calculate(hours):
             tokenized = [(time, tweet, category, tokenizer.ngrams_tokenizer(cleaned_tweets, ngrams)) for (time, tweet, category, cleaned_tweets) in cleaned]
 
             distincts = []
-            # progress = 0
             tp, tn, fp, fn = 0, 0, 0, 0
 
             for (time, tweet, category, tokens) in tokenized:
@@ -72,9 +69,6 @@ def calculate(hours):
                             fn += 1
                         else:
                             tn += 1
-
-                # progress += 1
-                # print('\r{}/{}'.format(progress, len(tokenized)), end='')
 
             time_elapsed = tm.time() - start_time
             accuracy = (tp + tn) / (tp + tn + fp + fn)
