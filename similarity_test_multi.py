@@ -7,7 +7,7 @@ import os
 import time as tm
 
 from modules import cleaner, tokenizer
-from modules.similarity import Jaccard, Cosine
+from modules.similarity import *
 
 parser = argparse.ArgumentParser(description='Evaluate classifier model using ten folds cross validation.')
 parser.add_argument('-o', '--output', default='output.csv', help='File name for output CSV, e.g. output.csv')
