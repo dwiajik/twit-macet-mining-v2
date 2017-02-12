@@ -120,4 +120,7 @@ class Pearson:
         sum_of_square_a = sum([value * value for attr, value in vec_a.items()])
         sum_of_square_b = sum([value * value for attr, value in vec_b.items()])
         divisor = sqrt((sum_of_square_a - (sum_of_a ** 2 / len(tokens))) * (sum_of_square_b - (sum_of_b ** 2 / len(tokens))))
-        return dividend / divisor
+        try:
+            return dividend / divisor
+        except ZeroDivisionError as e:
+            return 1
