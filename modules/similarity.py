@@ -25,7 +25,7 @@ class Jaccard:
         try:
             return len(self.intersect(a, b)) / len(self.union(a, b))
         except ZeroDivisionError as e:
-            return 1
+            return 0
 
 class WeightedJaccard:
     def index(self, a, b):
@@ -35,7 +35,7 @@ class WeightedJaccard:
         try:
             return dividend / divisor
         except ZeroDivisionError as e:
-            return 1
+            return 0
 
 class ExtendedJaccard:
     def index(self, a, b):
@@ -48,7 +48,7 @@ class ExtendedJaccard:
         try:
             return sop / divisor
         except ZeroDivisionError as e:
-            return 1
+            return 0
 
 class Cosine:
     def index(self, a, b):
@@ -62,7 +62,7 @@ class Cosine:
         try:
             return sop / (sqrt_soas * sqrt_sobs)
         except ZeroDivisionError as e:
-            return 1
+            return 0
 
 class Dice:
     def index(self, a, b):
@@ -73,7 +73,7 @@ class Dice:
         try:
             return (2 * sop) / (dot_a + dot_b)
         except ZeroDivisionError as e:
-            return 1
+            return 0
 
 class Euclidean:
     def index(self, a, b):
@@ -90,7 +90,7 @@ class Manhattan:
         try:
             return 1 - (sum_of_subtract / len(tokens))
         except ZeroDivisionError as e:
-            return 1
+            return 0
 
 # complicated
 # http://simeon.wikia.com/wiki/Minkowski_distance
@@ -119,11 +119,11 @@ class Pearson:
         sop = sum(list(map(lambda token: vec_a[token] * vec_b[token], tokens)))
         sum_of_a = sum([value for attr, value in vec_a.items()])
         sum_of_b = sum([value for attr, value in vec_b.items()])
-        dividend = sop - ((sum_of_a * sum_of_b) / len(tokens))
         sum_of_square_a = sum([value * value for attr, value in vec_a.items()])
         sum_of_square_b = sum([value * value for attr, value in vec_b.items()])
-        divisor = sqrt((sum_of_square_a - (sum_of_a ** 2 / len(tokens))) * (sum_of_square_b - (sum_of_b ** 2 / len(tokens))))
         try:
+            dividend = sop - ((sum_of_a * sum_of_b) / len(tokens))
+            divisor = sqrt((sum_of_square_a - (sum_of_a ** 2 / len(tokens))) * (sum_of_square_b - (sum_of_b ** 2 / len(tokens))))
             return dividend / divisor
         except ZeroDivisionError as e:
             return 1
