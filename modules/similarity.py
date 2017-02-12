@@ -87,7 +87,10 @@ class Manhattan:
     def index(self, a, b):
         tokens, vec_a, vec_b = vector(a, b)
         sum_of_subtract = sum(list(map(lambda token: vec_a[token] - vec_b[token], tokens)))
-        return 1 - (sum_of_subtract / len(tokens))
+        try:
+            return 1 - (sum_of_subtract / len(tokens))
+        except ZeroDivisionError as e:
+            return 1
 
 # complicated
 # http://simeon.wikia.com/wiki/Minkowski_distance
