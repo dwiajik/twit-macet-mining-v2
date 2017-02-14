@@ -101,9 +101,9 @@ def calculate(hours):
 p = Pool(4)
 pool_results = p.map(calculate, range(6, 49, 6))
 
-with open(os.path.join(os.path.dirname(__file__), args.output), 'w', newline='\n') as csv_output:
+with open(os.path.join(os.path.dirname(__file__), args.output), 'a', newline='\n') as csv_output:
     csv_writer = csv.writer(csv_output, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
-    csv_writer.writerow(['limit hours', 'calculation', 'ngrams', 'threshold', 'tp', 'tn', 'fp', 'fn', 'accuracy', 'precision', 'recall', 'f-score', 'time elapsed'])
+    csv_writer.writerow(['calculation', 'limit hours', 'ngrams', 'threshold', 'tp', 'tn', 'fp', 'fn', 'accuracy', 'precision', 'recall', 'f-score', 'time elapsed'])
     for pool_result in pool_results:
         for result in pool_result:
             csv_writer.writerow(result)
