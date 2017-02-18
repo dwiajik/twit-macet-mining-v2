@@ -83,7 +83,7 @@ def calculate(hours):
 
             print()
             print('Limit hours: {}'.format(hours))
-            print('Calculation: {}'.format(name))
+            print('Calculation: {}'.format(args.calculation))
             print('Ngrams: {}'.format(ngrams))
             print('Threshold: {}'.format(threshold))
             print('True positive: {}'.format(tp))
@@ -99,7 +99,7 @@ def calculate(hours):
             results.append([args.calculation, hours, ngrams, threshold, tp, tn, fp, fn, accuracy, precision, recall, fscore, time_elapsed])
     return results
 
-p = Pool(4)
+p = Pool(8)
 pool_results = p.map(calculate, range(6, 49, 6))
 
 with open(os.path.join(os.path.dirname(__file__), args.output), 'a', newline='\n') as csv_output:
