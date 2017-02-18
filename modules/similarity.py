@@ -78,7 +78,7 @@ class Dice:
 class Euclidean:
     def index(self, a, b):
         tokens, vec_a, vec_b = vector(a, b)
-        subtract = list(map(lambda token: vec_a[token] - vec_b[token], tokens))
+        subtract = list(map(lambda token: abs(vec_a[token] - vec_b[token]), tokens))
         sop = sum([e * e for e in subtract])
         distance = sqrt(sop)
         return 1 / (1 + distance)
@@ -86,7 +86,7 @@ class Euclidean:
 class Manhattan:
     def index(self, a, b):
         tokens, vec_a, vec_b = vector(a, b)
-        sum_of_subtract = sum(list(map(lambda token: vec_a[token] - vec_b[token], tokens)))
+        sum_of_subtract = sum(list(map(lambda token: abs(vec_a[token] - vec_b[token]), tokens)))
         try:
             return 1 - (sum_of_subtract / len(tokens))
         except ZeroDivisionError as e:
