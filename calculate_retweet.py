@@ -7,7 +7,7 @@ with open(os.path.join(os.path.dirname(__file__), 'tweets_corpus/similarity_data
 
 retweet_count = 0
 formal_retweet_count = 0
-for date, tweet, category in tweets:
+for time, tweet, category in tweets:
     if category == 'retweet':
         retweet_count += 1
         if tweet[:4] == 'RT @':

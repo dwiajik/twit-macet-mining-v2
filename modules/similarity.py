@@ -78,7 +78,7 @@ class Dice:
 class Euclidean:
     def index(self, a, b):
         tokens, vec_a, vec_b = vector(a, b)
-        subtract = list(map(lambda token: vec_a[token] - vec_b[token], tokens))
+        subtract = list(map(lambda token: abs(vec_a[token] - vec_b[token]), tokens))
         sop = sum([e * e for e in subtract])
         distance = sqrt(sop)
         return 1 / (1 + distance)
