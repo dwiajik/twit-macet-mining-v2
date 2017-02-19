@@ -6,13 +6,16 @@ import numpy
 import os
 import time as tm
 
-from modules import cleaner, tokenizer
+from modules import cleaner, tokenizer, time as t
+from modules.location import Location
 from modules.similarity import *
 
 parser = argparse.ArgumentParser(description='Evaluate classifier model using ten folds cross validation.')
 parser.add_argument('-o', '--output', default='output.csv', help='File name for output CSV, e.g. output.csv')
 parser.add_argument('-c', '--calculation', type=str, default='jaccard', help='Algorithm: jaccard, cosine')
 args = parser.parse_args()
+
+l = Location()
 
 calculations  = {
     'jaccard': Jaccard(),
