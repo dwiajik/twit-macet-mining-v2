@@ -11,6 +11,9 @@ def vector(a, b):
         vec_b[token] += 1
     return list(set(a + b)), vec_a, vec_b
 
+def mean(numbers):
+    return float(sum(numbers)) / max(len(numbers), 1)
+
 class Jaccard:
     def unique(self, a):
         return list(set(a))
@@ -27,16 +30,18 @@ class Jaccard:
         except ZeroDivisionError as e:
             return 0
 
+# same performance as original jaccard
 class WeightedJaccard:
     def index(self, a, b):
         tokens, vec_a, vec_b = vector(a, b)
-        dividend = sum(list(map(lambda token: min(vec_a[token], vec_b[token]), tokens)))
-        divisor = sum(list(map(lambda token: max(vec_a[token], vec_b[token]), tokens)))
+        numerator = sum(list(map(lambda token: min(vec_a[token], vec_b[token]), tokens)))
+        denominator = sum(list(map(lambda token: max(vec_a[token], vec_b[token]), tokens)))
         try:
-            return dividend / divisor
+            return numerator / denominator
         except ZeroDivisionError as e:
             return 0
 
+# same performance as original jaccard
 class ExtendedJaccard:
     def index(self, a, b):
         tokens, vec_a, vec_b = vector(a, b)
@@ -44,9 +49,9 @@ class ExtendedJaccard:
         dot_a = sum([value * value for attr, value in vec_a.items()])
         dot_b = sum([value * value for attr, value in vec_b.items()])
 
-        divisor = dot_a + dot_b - sop
+        denominator = dot_a + dot_b - sop
         try:
-            return sop / divisor
+            return sop / denominator
         except ZeroDivisionError as e:
             return 0
 
@@ -75,6 +80,7 @@ class Dice:
         except ZeroDivisionError as e:
             return 0
 
+# the values are weird
 class Euclidean:
     def index(self, a, b):
         tokens, vec_a, vec_b = vector(a, b)
@@ -113,6 +119,7 @@ class Overlap:
         except ZeroDivisionError as e:
             return 1
 
+# the values are weird
 class Pearson:
     def index(self, a, b):
         tokens, vec_a, vec_b = vector(a, b)
@@ -122,8 +129,25 @@ class Pearson:
         sum_of_square_a = sum([value * value for attr, value in vec_a.items()])
         sum_of_square_b = sum([value * value for attr, value in vec_b.items()])
         try:
-            dividend = sop - ((sum_of_a * sum_of_b) / len(tokens))
-            divisor = sqrt((sum_of_square_a - (sum_of_a ** 2 / len(tokens))) * (sum_of_square_b - (sum_of_b ** 2 / len(tokens))))
-            return dividend / divisor
+            numerator = sop - ((sum_of_a * sum_of_b) / len(tokens))
+            denominator = sqrt((sum_of_square_a - (sum_of_a ** 2 / len(tokens))) * (sum_of_square_b - (sum_of_b ** 2 / len(tokens))))
+            return numerator / denominator
         except ZeroDivisionError as e:
             return 1
+
+class Combination:
+    def __init__(self):
+        self.cosine = Cosine()
+        self.dice = Dice()
+        self.jaccard = Jaccard()
+        self.manhattan = Manhattan()
+        self.overlap = Overlap()
+
+    def index(self, a, b):
+        cosine = self.cosine.index(a, b)
+        dice = self.dice.index(a, b)
+        jaccard = self.jaccard.index(a, b)
+        manhattan = self.manhattan.index(a, b)
+        overlap = self.overlap.index(a, b)
+
+        return mean([cosine, dice, jaccard, manhattan, overlap])
