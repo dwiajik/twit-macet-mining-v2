@@ -23,7 +23,8 @@ calculations  = {
     'manhattan': Manhattan(),
     'euclidean': Euclidean(),
     'overlap': Overlap(),
-    'pearson': Pearson()
+    'pearson': Pearson(),
+    'combination': Combination()
 }
 
 with open(os.path.join(os.path.dirname(__file__), 'tweets_corpus/similarity_dataset_15028.csv'), newline='\n') as csv_input:
