@@ -35,7 +35,7 @@ def calculate(hours):
     results = []
     calculation = calculations[args.calculation]
     for ngrams in range(1, 25): # 1-6
-        for threshold in numpy.arange(0.1, 1.1, 0.1): # 0.1-1.0
+        for threshold in [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]: # 0.1-1.0
             start_time = tm.time()
 
             cleaned = [(time, tweet, category, cleaner.clean(tweet)) for (time, tweet, category) in tweets]
