@@ -28,7 +28,7 @@ class Jaccard:
         try:
             return len(self.intersect(a, b)) / len(self.union(a, b))
         except ZeroDivisionError as e:
-            return 0
+            return 1
 
 # same performance as original jaccard
 class WeightedJaccard:
@@ -39,7 +39,7 @@ class WeightedJaccard:
         try:
             return numerator / denominator
         except ZeroDivisionError as e:
-            return 0
+            return 1
 
 # same performance as original jaccard
 class ExtendedJaccard:
@@ -53,7 +53,7 @@ class ExtendedJaccard:
         try:
             return sop / denominator
         except ZeroDivisionError as e:
-            return 0
+            return 1
 
 class Cosine:
     def index(self, a, b):
@@ -67,7 +67,7 @@ class Cosine:
         try:
             return sop / (sqrt_soas * sqrt_sobs)
         except ZeroDivisionError as e:
-            return 0
+            return 1
 
 class Dice:
     def index(self, a, b):
@@ -78,7 +78,7 @@ class Dice:
         try:
             return (2 * sop) / (dot_a + dot_b)
         except ZeroDivisionError as e:
-            return 0
+            return 1
 
 # the values are weird
 class Euclidean:
@@ -96,7 +96,7 @@ class Manhattan:
         try:
             return 1 - (sum_of_subtract / len(tokens))
         except ZeroDivisionError as e:
-            return 0
+            return 1
 
 # complicated
 # http://simeon.wikia.com/wiki/Minkowski_distance
