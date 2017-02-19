@@ -35,7 +35,7 @@ for (time, tweet, category, tokens) in tokenized:
     if len(distincts) == 0:
         distincts.append((time, tweet, tokens))
     else:
-        is_distinct = True
+        is_distinct = { 'text': True, 'tl': True }
         for (distinct_time, distinct_tweet, distinct_tokens) in distincts:
             dt = datetime.strptime(time, '%Y-%m-%d %H:%M:%S')
             distinct_dt = datetime.strptime(distinct_time, '%Y-%m-%d %H:%M:%S')
@@ -46,21 +46,21 @@ for (time, tweet, category, tokens) in tokenized:
                 continue
 
             index = calculation.index(tokens, distinct_tokens)
-            if index >= threshold or (t.is_text_similar(tweet, distinct_tweet) and l.is_first_loc_similar(tweet, distinct_tweet)):
-                is_distinct = False
-                break
-                
-        if is_distinct:
+            if index >= threshold:
+                is_distinct['text'] = False
+
+            if t.is_text_similar(tweet, distinct_tweet) and l.is_first_loc_similar(tweet, distinct_tweet):
+                is_distinct['tl'] = False
+
+        if is_distinct['text'] or is_distinct['tl']:
             distincts.append((time, tweet, tokens))
 
             if category == 'new':
                 tp += 1
             else:
-                # print(tweet)
                 fp += 1
         else:
             if category == 'new':
-                # print(tweet)
                 fn += 1
             else:
                 tn += 1
