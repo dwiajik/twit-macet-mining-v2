@@ -33,7 +33,7 @@ with open(os.path.join(os.path.dirname(__file__), 'tweets_corpus/similarity_data
 def calculate(hours):
     results = []
     calculation = calculations[args.calculation]
-    for ngrams in range(1, 7): # 1-6
+    for ngrams in range(1, 25): # 1-6
         for threshold in numpy.arange(0.1, 1.1, 0.1): # 0.1-1.0
             start_time = tm.time()
 
@@ -99,12 +99,14 @@ def calculate(hours):
             results.append([args.calculation, hours, ngrams, threshold, tp, tn, fp, fn, accuracy, precision, recall, fscore, time_elapsed])
     return results
 
-p = Pool(8)
-pool_results = p.map(calculate, range(6, 49, 6))
+# p = Pool(8)
+# pool_results = p.map(calculate, range(6, 49, 6))
+
+results = calculate(12)
 
 with open(os.path.join(os.path.dirname(__file__), args.output), 'a', newline='\n') as csv_output:
     csv_writer = csv.writer(csv_output, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
     # csv_writer.writerow(['calculation', 'limit hours', 'ngrams', 'threshold', 'tp', 'tn', 'fp', 'fn', 'accuracy', 'precision', 'recall', 'f-score', 'time elapsed'])
-    for pool_result in pool_results:
-        for result in pool_result:
-            csv_writer.writerow(result)
+    # for pool_result in pool_results:
+    for result in results:
+        csv_writer.writerow(result)
