@@ -14,29 +14,29 @@ args = parser.parse_args()
 
 calculations  = [
     {
-        name: 'cosine',
-        calculation: Cosine(),
-        ngrams: 5,
+        'name': 'cosine',
+        'calculation': Cosine(),
+        'ngrams': 5,
     },
     {
-        name: 'dice',
-        calculation: Dice(),
-        ngrams: 7,
+        'name': 'dice',
+        'calculation': Dice(),
+        'ngrams': 7,
     },
     {
-        name: 'jaccard',
-        calculation: Jaccard(),
-        ngrams: 7,
+        'name': 'jaccard',
+        'calculation': Jaccard(),
+        'ngrams': 7,
     },
     {
-        name: 'manhattan',
-        calculation: Manhattan(),
-        ngrams: 7,
+        'name': 'manhattan',
+        'calculation': Manhattan(),
+        'ngrams': 7,
     },
     {
-        name: 'overlap',
-        calculation: Overlap(),
-        ngrams: 4,
+        'name': 'overlap',
+        'calculation': Overlap(),
+        'ngrams': 4,
     }
 ]
 
@@ -57,9 +57,9 @@ for (time, tweet, category, cleaned_tweets) in cleaned:
         if category2 == 'new' and dt2 > dt:
             cal_res = []
             for cal_obj in calculations:
-                tweet_tokens = tokenizer.ngrams_tokenizer(cleaned_tweets, cal_obj.ngrams)
-                tweet2_tokens = tokenizer.ngrams_tokenizer(cleaned_tweets2, cal_obj.ngrams)
-                index = cal_obj.calculation.index(tweet_tokens, tweet2_tokens)
+                tweet_tokens = tokenizer.ngrams_tokenizer(cleaned_tweets, cal_obj['ngrams'])
+                tweet2_tokens = tokenizer.ngrams_tokenizer(cleaned_tweets2, cal_obj['ngrams'])
+                index = cal_obj['calculation'].index(tweet_tokens, tweet2_tokens)
                 cal_res.append(index)
             results.append([tweet, tweet2] + cal_res)
 
