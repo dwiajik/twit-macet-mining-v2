@@ -49,6 +49,7 @@ results = []
 cleaned = [(time, tweet, category, cleaner.clean(tweet)) for (time, tweet, category) in tweets]
 # tokenized = [(time, tweet, category, tokenizer.ngrams_tokenizer(cleaned_tweets, ngrams)) for (time, tweet, category, cleaned_tweets) in cleaned]
 
+progress = 0
 for (time, tweet, category, cleaned_tweets) in cleaned:
     for (time2, tweet2, category2, cleaned_tweets2) in cleaned:
         dt = datetime.strptime(time, '%Y-%m-%d %H:%M:%S')
@@ -62,6 +63,9 @@ for (time, tweet, category, cleaned_tweets) in cleaned:
                 index = cal_obj['calculation'].index(tweet_tokens, tweet2_tokens)
                 cal_res.append(index)
             results.append([tweet, tweet2] + cal_res)
+
+        progress += 1
+        print('\r{}/{}'.format(progress, len(cleaned)), end='')
 
 with open(os.path.join(os.path.dirname(__file__), args.output), 'a', newline='\n') as csv_output:
     csv_writer = csv.writer(csv_output, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
