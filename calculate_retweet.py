@@ -13,5 +13,4 @@ for time, tweet, category in tweets:
         if tweet[:4] == 'RT @':
             formal_retweet_count += 1
 
-print('Retweet count: {}'.format(retweet_count))
-print('Formal retweet count: {}'.format(formal_retweet_count))
+print('Formal retweet count: {}/{}'.format(formal_retweet_count, retweet_count))
