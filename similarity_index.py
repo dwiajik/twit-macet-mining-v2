@@ -40,6 +40,8 @@ calculations  = [
     }
 ]
 
+hours = 48
+
 with open(os.path.join(os.path.dirname(__file__), 'tweets_corpus/similarity_dataset_15028.csv'), newline='\n') as csv_input:
     dataset = csv.reader(csv_input, delimiter=',', quotechar='"')
     tweets = [(line[0], line[1], line[2]) for line in dataset]
@@ -50,22 +52,27 @@ cleaned = [(time, tweet, category, cleaner.clean(tweet)) for (time, tweet, categ
 # tokenized = [(time, tweet, category, tokenizer.ngrams_tokenizer(cleaned_tweets, ngrams)) for (time, tweet, category, cleaned_tweets) in cleaned]
 
 progress = 0
+written = 0
+
 for (time, tweet, category, cleaned_tweets) in cleaned:
     for (time2, tweet2, category2, cleaned_tweets2) in cleaned:
         dt = datetime.strptime(time, '%Y-%m-%d %H:%M:%S')
         dt2 = datetime.strptime(time2, '%Y-%m-%d %H:%M:%S')
 
-        if category2 == 'new' and dt2 > dt:
-            cal_res = []
-            for cal_obj in calculations:
-                tweet_tokens = tokenizer.ngrams_tokenizer(cleaned_tweets, cal_obj['ngrams'])
-                tweet2_tokens = tokenizer.ngrams_tokenizer(cleaned_tweets2, cal_obj['ngrams'])
-                index = cal_obj['calculation'].index(tweet_tokens, tweet2_tokens)
-                cal_res.append(index)
-            results.append([tweet, tweet2] + cal_res)
+        if category2 == 'new' and dt > dt2:
+            time_diff = dt - dt2
+            if time_diff <= timedelta(hours=hours):
+                cal_res = []
+                for cal_obj in calculations:
+                    tweet_tokens = tokenizer.ngrams_tokenizer(cleaned_tweets, cal_obj['ngrams'])
+                    tweet2_tokens = tokenizer.ngrams_tokenizer(cleaned_tweets2, cal_obj['ngrams'])
+                    index = cal_obj['calculation'].index(tweet_tokens, tweet2_tokens)
+                    cal_res.append(index)
+                results.append([time, tweet, time2, tweet2] + cal_res)
+                written += 1
 
-        progress += 1
-        print('\r{}/{}'.format(progress, len(cleaned)), end='')
+    progress += 1
+    print('\r{}/{}, written: {}'.format(progress, len(cleaned), written), end='')
 
 with open(os.path.join(os.path.dirname(__file__), args.output), 'a', newline='\n') as csv_output:
     csv_writer = csv.writer(csv_output, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
