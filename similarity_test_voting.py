@@ -82,8 +82,6 @@ for (time, tweet, category, cleaned_tweets) in cleaned:
             break
 
     if is_retweet:
-        distincts.append((time, tweet, tokens))
-
         if category == 'retweet':
             tn += 1
         else:
