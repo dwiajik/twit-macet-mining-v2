@@ -5,7 +5,7 @@ from multiprocessing import Pool
 import os
 import time as tm
 
-from modules.distance import *
+from difflib import SequenceMatcher as SM
 
 parser = argparse.ArgumentParser(description='Evaluate classifier model using ten folds cross validation.')
 parser.add_argument('-o', '--output', default='output.csv', help='File name for output CSV, e.g. output.csv')
@@ -13,11 +13,13 @@ args = parser.parse_args()
 
 hours = 12
 
-lcs = LCS()
+sm = SequenceMatcher(lambda x: x == " ")
 
 with open(os.path.join(os.path.dirname(__file__), 'tweets_corpus/similarity_dataset_15028.csv'), newline='\n') as csv_input:
     dataset = csv.reader(csv_input, delimiter=',', quotechar='"')
     tweets = [(line[0], line[1], line[2]) for line in dataset]
+
+tweets = [(time, cleaner.clean(tweet), category) for (time, tweet, category) in tweets]
 
 results = []
 for threshold in [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]: # 0.1-1.0
@@ -40,7 +42,8 @@ for threshold in [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]: # 0.1-1.0
                     distincts.remove((distinct_time, distinct_tweet))
                     continue
 
-                index = lcs.length(tweet, distinct_tweet) / min(len(tweet), len(distinct_tweet))
+                sm.set_seqs(tweet, distinct_tweet)
+                index = sm.ratio()
                 if index >= threshold:
                     is_distinct = False
                     break
