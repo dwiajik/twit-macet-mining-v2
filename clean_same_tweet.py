@@ -3,7 +3,7 @@ import csv
 import os
 
 parser = argparse.ArgumentParser(description='Evaluate classifier model using ten folds cross validation.')
-parser.add_argument('-i', '--input', default='tweets_corpus/pair_dataset_4699.csv', help='File name for input CSV, e.g. input.csv')
+parser.add_argument('-i', '--input', default='tweets_corpus/tweet-2016-07-06.csv', help='File name for input CSV, e.g. input.csv')
 parser.add_argument('-o', '--output', default='output.csv', help='File name for output CSV, e.g. output.csv')
 args = parser.parse_args()
 

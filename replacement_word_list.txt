@@ -21,3 +21,5 @@ kend,kendaraan
 blm,belum
 concat,condongcatur
 jokteng,pojok beteng
+per3an,pertigaan
+per4an,perempatan
