@@ -40,7 +40,7 @@ for (time, tweet, category, cleaned) in cleaned_tweets:
         dt = datetime.strptime(time, '%Y-%m-%d %H:%M:%S')
         dt2 = datetime.strptime(time2, '%Y-%m-%d %H:%M:%S')
 
-        if dt > dt2:
+        if category2 == 'new' and dt > dt2:
             # time_diff = dt - dt2
             # score = calculation.index(tokens, tokens2)
             score = calculation.index(cleaned, cleaned2, tfidf)
