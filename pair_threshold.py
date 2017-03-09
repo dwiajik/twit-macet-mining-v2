@@ -1,6 +1,7 @@
 import argparse
 import csv
 import os
+import random
 
 parser = argparse.ArgumentParser(description='Evaluate classifier model using ten folds cross validation.')
 parser.add_argument('-o', '--output', default='output.csv', help='File name for output CSV, e.g. output.csv')
@@ -9,10 +10,10 @@ args = parser.parse_args()
 fold = 10
 calculations = ['cosine', 'dice', 'jaccard', 'manhattan', 'overlap', 'cosine_tfidf', 'dice_tfidf', 'manhattan_tfidf', 'lcs']
 
-with open(os.path.join(os.path.dirname(__file__), '4095-pair-dataset.csv'), newline='\n') as csv_input:
+with open(os.path.join(os.path.dirname(__file__), 'tweets_corpus/4095-pair-dataset-different.csv'), newline='\n') as csv_input:
     dataset = csv.reader(csv_input, delimiter=',', quotechar='"')
     next(dataset)
-    tweets = [({
+    different_tweets = [({
         'cosine': float(line[5]),
         'dice': float(line[6]),
         'jaccard': float(line[7]),
@@ -23,6 +24,27 @@ with open(os.path.join(os.path.dirname(__file__), '4095-pair-dataset.csv'), newl
         'manhattan_tfidf': float(line[12]),
         'lcs': float(line[13]),
         }, line[4]) for line in dataset]
+
+with open(os.path.join(os.path.dirname(__file__), 'tweets_corpus/4095-pair-dataset-similar.csv'), newline='\n') as csv_input:
+    dataset = csv.reader(csv_input, delimiter=',', quotechar='"')
+    next(dataset)
+    similar_tweets = [({
+        'cosine': float(line[5]),
+        'dice': float(line[6]),
+        'jaccard': float(line[7]),
+        'manhattan': float(line[8]),
+        'overlap': float(line[9]),
+        'cosine_tfidf': float(line[10]),
+        'dice_tfidf': float(line[11]),
+        'manhattan_tfidf': float(line[12]),
+        'lcs': float(line[13]),
+        }, line[4]) for line in dataset]
+
+random.shuffle(different_tweets)
+
+tweets = different_tweets[:590] + similar_tweets * 5
+
+random.shuffle(tweets)
 
 print('Dataset of {} tweet-pairs'.format(len(tweets)))
 
