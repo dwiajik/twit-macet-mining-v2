@@ -12,7 +12,7 @@ args = parser.parse_args()
 
 calculation = Overlap()
 ngrams = 1
-threshold = 0.55
+threshold = 0.8
 
 progress = 0
 

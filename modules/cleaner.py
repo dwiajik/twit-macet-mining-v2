@@ -8,7 +8,7 @@ def clean(tweet):
     tweet = tweet.lower()
 
     tweet = re.sub(r'http\S+', ' ', tweet)
-    tweet = re.sub(r'#\S+', ' ', tweet)
+    # tweet = re.sub(r'#\S+', ' ', tweet)
     tweet = re.sub(r'@[a-zA-Z0-9_]+', ' ', tweet)
     tweet = re.sub(r'RT\s', ' ', tweet)
     tweet = re.sub(r'[^a-zA-Z0-9]', ' ', tweet)

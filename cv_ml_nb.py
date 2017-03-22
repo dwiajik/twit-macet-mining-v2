@@ -21,11 +21,11 @@ with open(os.path.join(os.path.dirname(__file__), 'tweets_corpus/4095-pair-datas
         'cosine': float(line[5]),
         'dice': float(line[6]),
         'jaccard': float(line[7]),
-        'manhattan': float(line[8]),
+        # 'manhattan': float(line[8]),
         'overlap': float(line[9]),
-        'cosine_tfidf': float(line[10]),
-        'dice_tfidf': float(line[11]),
-        'manhattan_tfidf': float(line[12]),
+        # 'cosine_tfidf': float(line[10]),
+        # 'dice_tfidf': float(line[11]),
+        # 'manhattan_tfidf': float(line[12]),
         'lcs': float(line[13]),
         }, line[4]) for line in dataset]
 
@@ -36,18 +36,19 @@ with open(os.path.join(os.path.dirname(__file__), 'tweets_corpus/4095-pair-datas
         'cosine': float(line[5]),
         'dice': float(line[6]),
         'jaccard': float(line[7]),
-        'manhattan': float(line[8]),
+        # 'manhattan': float(line[8]),
         'overlap': float(line[9]),
-        'cosine_tfidf': float(line[10]),
-        'dice_tfidf': float(line[11]),
-        'manhattan_tfidf': float(line[12]),
+        # 'cosine_tfidf': float(line[10]),
+        # 'dice_tfidf': float(line[11]),
+        # 'manhattan_tfidf': float(line[12]),
         'lcs': float(line[13]),
         }, line[4]) for line in dataset]
 
 for i in range(n):
     random.shuffle(different_tweets)
+    random.shuffle(similar_tweets)
 
-    tweets = different_tweets[:590] + similar_tweets * 5
+    tweets = different_tweets[:600] + similar_tweets[:600]
 
     random.shuffle(tweets)
 
